@@ -17,6 +17,7 @@ from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier
 
 MODEL_DIR = Path(__file__).resolve().parent.parent / "model"
 SEED = 42
@@ -26,9 +27,16 @@ def _logistic_regression():
     return LogisticRegression(max_iter=1000, random_state=SEED)
 
 
+def _decision_tree():
+    # Default settings: the tree grows until every leaf is pure. random_state
+    # fixes the tie-breaking between equally good splits so results repeat.
+    return DecisionTreeClassifier(random_state=SEED)
+
+
 # display name -> (file name, classifier factory)
 _REGISTRY = {
     "Logistic Regression": ("logistic_regression.joblib", _logistic_regression),
+    "Decision Tree": ("decision_tree.joblib", _decision_tree),
 }
 
 MODEL_NAMES = list(_REGISTRY)
