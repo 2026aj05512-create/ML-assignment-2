@@ -15,6 +15,7 @@ then run train.py again. The app picks it up automatically.
 from pathlib import Path
 
 from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
@@ -33,10 +34,17 @@ def _decision_tree():
     return DecisionTreeClassifier(random_state=SEED)
 
 
+def _knn():
+    # k = 5 is the usual starting point. KNN is distance based, which is why
+    # the scaler in the pipeline matters for this model.
+    return KNeighborsClassifier(n_neighbors=5)
+
+
 # display name -> (file name, classifier factory)
 _REGISTRY = {
     "Logistic Regression": ("logistic_regression.joblib", _logistic_regression),
     "Decision Tree": ("decision_tree.joblib", _decision_tree),
+    "KNN": ("knn.joblib", _knn),
 }
 
 MODEL_NAMES = list(_REGISTRY)
