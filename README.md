@@ -5,7 +5,8 @@ ML Assignment 2 - M.Tech (AIML), BITS Pilani WILP
 Five classification models trained on the UCI Statlog (Landsat Satellite) dataset,
 compared on six evaluation metrics, and served through a Streamlit web app.
 
-> Work in progress. Sections below are filled in as the project is built.
+> Work in progress. Three of the five models are done so far (Logistic Regression,
+> Decision Tree and KNN). Naive Bayes and SVM are being added.
 
 ## a. Problem statement
 
@@ -61,19 +62,44 @@ Exploration notes are in `notebooks/01_eda.ipynb`.
 
 ## c. GitHub repository link
 
-_To be added._
+https://github.com/2026aj05512-create/ML-assignment-2
+
+Live Streamlit app: _link to be added after deployment._
+
+### What the app does
+
+- Upload a test CSV (or tick the option to use the bundled `test_data.csv`).
+- Choose a model from a dropdown. The saved model is loaded, not retrained.
+- Shows Accuracy, AUC, Precision, Recall, F1 and MCC for the chosen model.
+- Shows the confusion matrix and the per-class classification report.
+- A second tab compares all available models on the uploaded data (appears once there
+  is more than one model).
+- Checks the uploaded file and shows a clear message if columns are missing or the
+  labels are not recognised.
 
 ## d. Models used
+
+Every model is a scikit-learn pipeline: `StandardScaler` (fitted on the training data
+only) followed by the classifier, all trained once on the training split with
+`random_state=42` where applicable.
+
+| Model | Settings | Status |
+|---|---|---|
+| Logistic Regression | `max_iter=1000` | Done |
+| Decision Tree | scikit-learn defaults (fully grown) | Done |
+| KNN | `n_neighbors=5` | Done |
+| Naive Bayes | Gaussian | Pending |
+| Support Vector Machine | RBF kernel, `probability=True` | Pending |
 
 ### Comparison table
 
 | ML Model Name | Accuracy | AUC | Precision | Recall | F1 | MCC |
 |---|---|---|---|---|---|---|
-| Logistic Regression | | | | | | |
-| Decision Tree | | | | | | |
-| KNN | | | | | | |
-| Naive Bayes | | | | | | |
-| Support Vector Machine | | | | | | |
+| Logistic Regression | 0.8395 | 0.9755 | 0.8116 | 0.7938 | 0.7971 | 0.8032 |
+| Decision Tree | 0.8505 | 0.9002 | 0.8331 | 0.8306 | 0.8317 | 0.8164 |
+| KNN | 0.9045 | 0.9786 | 0.8951 | 0.8886 | 0.8916 | 0.8827 |
+| Naive Bayes | pending | pending | pending | pending | pending | pending |
+| Support Vector Machine | pending | pending | pending | pending | pending | pending |
 
 ### Observations
 
