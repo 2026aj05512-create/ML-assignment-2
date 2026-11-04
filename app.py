@@ -183,19 +183,6 @@ with tab_selected:
             width="stretch",
         )
 
-    with st.expander("Predictions"):
-        predictions = pd.DataFrame(
-            {"actual": data[TARGET_COL].values, "predicted": result["y_pred"]}
-        )
-        predictions["correct"] = predictions["actual"] == predictions["predicted"]
-        st.dataframe(predictions, width="stretch", height=250)
-        st.download_button(
-            "Download predictions",
-            data=predictions.to_csv(index=False).encode(),
-            file_name=f"predictions_{model_name.lower().replace(' ', '_')}.csv",
-            mime="text/csv",
-        )
-
 if show_comparison:
     with tabs[1]:
         st.subheader(f"All {len(MODEL_NAMES)} models on this data")
