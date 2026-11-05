@@ -4,6 +4,7 @@ The models are loaded from model/ and are never retrained here. The uploaded
 file only needs the 36 feature columns plus the `land_cover` target column.
 """
 
+import textwrap
 from pathlib import Path
 
 import joblib
@@ -92,6 +93,27 @@ def plot_confusion_matrix(y_true, y_pred, classes):
     ax.set_xlabel("Predicted class")
     ax.set_ylabel("Actual class")
     plt.setp(ax.get_xticklabels(), rotation=35, ha="right")
+    fig.tight_layout()
+    return fig
+
+
+def plot_metric_comparison(comparison):
+    """Grouped bar chart: one group per model, one bar per metric.
+
+    Drawn with matplotlib so it is a fixed image: it cannot be zoomed or
+    dragged by scrolling over it.
+    """
+    fig, ax = plt.subplots(figsize=(10, 4.8))
+    comparison[METRIC_NAMES].plot(
+        kind="bar", ax=ax, width=0.82, color=sns.color_palette("colorblind", len(METRIC_NAMES))
+    )
+    ax.set_ylim(0.5, 1.0)
+    ax.set_ylabel("Score")
+    ax.set_xlabel("")
+    ax.set_xticklabels([textwrap.fill(name, width=14) for name in comparison.index], rotation=0)
+    ax.grid(axis="y", alpha=0.3)
+    ax.set_axisbelow(True)
+    ax.legend(ncol=len(METRIC_NAMES), loc="upper center", bbox_to_anchor=(0.5, -0.18), frameon=False)
     fig.tight_layout()
     return fig
 
@@ -196,8 +218,5 @@ if show_comparison:
             width="stretch",
         )
         st.caption("Green marks the best score in each column.")
-        st.bar_chart(
-            comparison[["Accuracy", "F1", "MCC"]],
-            stack=False,
-            color=["#1f6f5c", "#6fb7a3", "#e2a03f"],
-        )
+        st.pyplot(plot_metric_comparison(comparison))
+        st.caption("The chart's y-axis starts at 0.5 so the differences between models are visible.")
