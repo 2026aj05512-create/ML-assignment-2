@@ -19,6 +19,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 MODEL_DIR = Path(__file__).resolve().parent.parent / "model"
@@ -47,12 +48,20 @@ def _naive_bayes():
     return GaussianNB()
 
 
+def _svm():
+    # RBF kernel with scikit-learn's default C and gamma. SVMs are sensitive to
+    # feature scale, so the scaler in the pipeline matters here too.
+    # probability=True is needed so that AUC can be calculated.
+    return SVC(kernel="rbf", probability=True, random_state=SEED)
+
+
 # display name -> (file name, classifier factory)
 _REGISTRY = {
     "Logistic Regression": ("logistic_regression.joblib", _logistic_regression),
     "Decision Tree": ("decision_tree.joblib", _decision_tree),
     "KNN": ("knn.joblib", _knn),
     "Naive Bayes": ("naive_bayes.joblib", _naive_bayes),
+    "Support Vector Machine": ("svm.joblib", _svm),
 }
 
 MODEL_NAMES = list(_REGISTRY)
