@@ -15,6 +15,7 @@ then run train.py again. The app picks it up automatically.
 from pathlib import Path
 
 from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -40,11 +41,18 @@ def _knn():
     return KNeighborsClassifier(n_neighbors=5)
 
 
+def _naive_bayes():
+    # Gaussian variant: the features are continuous pixel intensities, so each
+    # feature is modelled as a normal distribution within every class.
+    return GaussianNB()
+
+
 # display name -> (file name, classifier factory)
 _REGISTRY = {
     "Logistic Regression": ("logistic_regression.joblib", _logistic_regression),
     "Decision Tree": ("decision_tree.joblib", _decision_tree),
     "KNN": ("knn.joblib", _knn),
+    "Naive Bayes": ("naive_bayes.joblib", _naive_bayes),
 }
 
 MODEL_NAMES = list(_REGISTRY)
