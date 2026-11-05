@@ -5,8 +5,8 @@ ML Assignment 2 - M.Tech (AIML), BITS Pilani WILP
 Five classification models trained on the UCI Statlog (Landsat Satellite) dataset,
 compared on six evaluation metrics, and served through a Streamlit web app.
 
-> Work in progress. Three of the five models are done so far (Logistic Regression,
-> Decision Tree and KNN). Naive Bayes and SVM are being added.
+> Work in progress. Four of the five models are done so far (Logistic Regression,
+> Decision Tree, KNN and Naive Bayes). SVM is being added.
 
 ## a. Problem statement
 
@@ -88,7 +88,7 @@ only) followed by the classifier, all trained once on the training split with
 | Logistic Regression | `max_iter=1000` | Done |
 | Decision Tree | scikit-learn defaults (fully grown) | Done |
 | KNN | `n_neighbors=5` | Done |
-| Naive Bayes | Gaussian | Pending |
+| Naive Bayes | Gaussian | Done |
 | Support Vector Machine | RBF kernel, `probability=True` | Pending |
 
 ### Comparison table
@@ -98,7 +98,7 @@ only) followed by the classifier, all trained once on the training split with
 | Logistic Regression | 0.8395 | 0.9755 | 0.8116 | 0.7938 | 0.7971 | 0.8032 |
 | Decision Tree | 0.8505 | 0.9002 | 0.8331 | 0.8306 | 0.8317 | 0.8164 |
 | KNN | 0.9045 | 0.9786 | 0.8951 | 0.8886 | 0.8916 | 0.8827 |
-| Naive Bayes | pending | pending | pending | pending | pending | pending |
+| Naive Bayes | 0.7965 | 0.9551 | 0.7864 | 0.7877 | 0.7833 | 0.7531 |
 | Support Vector Machine | pending | pending | pending | pending | pending | pending |
 
 ### Observations
