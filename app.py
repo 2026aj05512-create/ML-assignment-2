@@ -14,9 +14,15 @@ import seaborn as sns
 import streamlit as st
 from sklearn.metrics import classification_report, confusion_matrix
 
-from src.data_loader import CLASS_NAMES, TARGET_COL, feature_names
-from src.metrics import METRIC_NAMES, evaluate
-from src.models import MODEL_NAMES, model_path
+from src.training_all_models import (
+    CLASS_NAMES,
+    METRIC_NAMES,
+    MODEL_NAMES,
+    TARGET_COL,
+    evaluate,
+    feature_names,
+    model_path,
+)
 
 BUNDLED_TEST_FILE = Path(__file__).resolve().parent / "test_data.csv"
 FEATURES = feature_names()

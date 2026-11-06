@@ -77,8 +77,8 @@ values (two visible and two near-infrared bands, labelled `band1` to `band4`), g
 The four `centre_band1` to `centre_band4` features describe the pixel that is actually
 being classified. The other 32 describe its surroundings.
 
-Findings from the exploratory analysis (the `eda()` function in `src/core.py`, printed
-when you run it):
+Findings from the exploratory analysis (the EDA block of
+`src/training_all_models.py`, printed when you run it):
 
 - The classes have clearly different average centre-pixel profiles. For example cotton crop
   has a very low band 2 and the highest band 4.
@@ -119,10 +119,10 @@ Live Streamlit app: _link to be added after deployment._
 | File or folder | Purpose |
 |---|---|
 | `app.py` | Streamlit app |
-| `src/core.py` | All the machine-learning code in one file: data loading, EDA, preprocessing, the five models, the evaluation metrics, and training. Run it with `python src/core.py` |
+| `src/training_all_models.py` | All the machine-learning code in one file, split into clearly marked blocks: data loading, EDA, preprocessing, one block per model (Logistic Regression, Decision Tree, KNN, Naive Bayes, SVM), metrics, and training. Run it with `python src/training_all_models.py` |
 | `test_data.csv` | Test data used in the experiments (the official test split); upload this file in the app |
 | `model/` | Saved trained pipelines (`.joblib`), one per classifier. Each includes the fitted scaler |
-| `data/` | Raw dataset files (`sat.trn`, `sat.tst`) and the original documentation (`sat.doc`) |
+| `data/` | Raw dataset files (`sat.trn`, `sat.tst`) used for training, and the original documentation (`sat.doc`) |
 | `.streamlit/config.toml` | App theme |
 | `requirements.txt` | Python dependencies |
 
@@ -143,7 +143,9 @@ The uploaded CSV must contain the 36 feature columns and the `land_cover` column
 
 All five models were trained on the same training split and evaluated on the same test
 split. Each one is a scikit-learn pipeline: a `StandardScaler` followed by the classifier.
-The code for each model is in section 4 of `src/core.py`, and training is in section 6.
+The code for each model is in its own block of `src/training_all_models.py` (search for
+"LOGISTIC REGRESSION BLOCK", "DECISION TREE BLOCK", "KNN BLOCK", "NAIVE BAYES BLOCK" and
+"SVM BLOCK"), and the loop that trains and saves them is in the TRAINING BLOCK.
 
 | # | Model | How it works | Settings |
 |---|---|---|---|
@@ -196,7 +198,7 @@ Results on the 2,000-row test set.
 
 ```
 pip install -r requirements.txt
-python src/core.py         # prints the EDA, writes test_data.csv, trains the 5 models into model/
+python src/training_all_models.py   # prints the EDA, writes test_data.csv, trains the 5 models into model/
 streamlit run app.py       # launches the app
 ```
 
