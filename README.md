@@ -77,14 +77,15 @@ values (two visible and two near-infrared bands, labelled `band1` to `band4`), g
 The four `centre_band1` to `centre_band4` features describe the pixel that is actually
 being classified. The other 32 describe its surroundings.
 
-Findings from the exploratory analysis (`notebooks/01_eda.ipynb`):
+Findings from the exploratory analysis (the `eda()` function in `src/core.py`, printed
+when you run it):
 
 - The classes have clearly different average centre-pixel profiles. For example cotton crop
   has a very low band 2 and the highest band 4.
 - Damp grey soil and very damp grey soil have similar profiles, which makes them the
   hardest pair to separate.
 - Neighbouring pixels in the same band are strongly correlated (highest pairwise
-  correlation 0.959; 5.1% of feature pairs are above 0.9), so the features are far from
+  correlation 0.959; 10.5% of feature pairs, 66 of 630, are above 0.9), so the features are far from
   independent.
 
 ### Data preprocessing
@@ -94,7 +95,12 @@ Findings from the exploratory analysis (`notebooks/01_eda.ipynb`):
 2. **No cleaning needed.** There are no missing values and no duplicate rows.
 3. **Feature scaling.** A `StandardScaler` is fitted on the training data only and then
    applied to the test data. It is part of each model's pipeline, so the saved models
-   scale new data automatically and nothing is refitted in the app.
+   scale uploaded data automatically and nothing is refitted in the app. Scaling clearly
+   helps Logistic Regression (test accuracy 83.95% with it, 79.45% without) and also SVM
+   (89.55% against 88.60%); it makes almost no difference to the Decision Tree, KNN and
+   Naive Bayes, but all five use it so they are treated alike. No new features are
+   created: all 36 inputs are already numeric, complete and on the same 0-255 scale, so
+   scaling is the only transformation needed.
 4. **Labels kept as they are** (1, 2, 3, 4, 5, 7), with human-readable names added for the
    app and the reports.
 5. **No cross-validation.** The dataset documentation asks for a single train/test run,
@@ -113,16 +119,10 @@ Live Streamlit app: _link to be added after deployment._
 | File or folder | Purpose |
 |---|---|
 | `app.py` | Streamlit app |
-| `train.py` | Trains the five models once on the training split, saves them, and writes the results table |
-| `prepare_data.py` | Writes `test_data.csv` from the official test split |
-| `test_data.csv` | Test data used in the experiments; upload this file in the app |
-| `src/data_loader.py` | Loads the raw dataset files and names the columns |
-| `src/models.py` | Defines the five classifiers and where each saved model lives |
-| `src/metrics.py` | Calculates the six evaluation metrics (shared by `train.py` and the app) |
-| `model/` | Saved trained pipelines (`.joblib`), one per classifier |
-| `results/metrics_comparison.csv` | Test-set metrics for all models, written by `train.py` |
+| `src/core.py` | All the machine-learning code in one file: data loading, EDA, preprocessing, the five models, the evaluation metrics, and training. Run it with `python src/core.py` |
+| `test_data.csv` | Test data used in the experiments (the official test split); upload this file in the app |
+| `model/` | Saved trained pipelines (`.joblib`), one per classifier. Each includes the fitted scaler |
 | `data/` | Raw dataset files (`sat.trn`, `sat.tst`) and the original documentation (`sat.doc`) |
-| `notebooks/01_eda.ipynb` | Exploratory data analysis |
 | `.streamlit/config.toml` | App theme |
 | `requirements.txt` | Python dependencies |
 
@@ -143,6 +143,7 @@ The uploaded CSV must contain the 36 feature columns and the `land_cover` column
 
 All five models were trained on the same training split and evaluated on the same test
 split. Each one is a scikit-learn pipeline: a `StandardScaler` followed by the classifier.
+The code for each model is in section 4 of `src/core.py`, and training is in section 6.
 
 | # | Model | How it works | Settings |
 |---|---|---|---|
@@ -184,19 +185,18 @@ Results on the 2,000-row test set.
 
 | ML Model Name | Observation about model performance |
 |---|---|
-| Logistic Regression | |
-| Decision Tree | |
-| KNN | |
-| Naive Bayes | |
-| Support Vector Machine | |
-| **Overall winner for this dataset** | |
+| Logistic Regression | Reaches 83.95% accuracy, with 87.6% on the training data, so the gap is small and the model is not overfitting. Its probability ranking is strong (AUC 0.9755, third best), but its hard predictions are weaker. It is excellent on red soil (F1 0.98) and cotton crop (0.94), yet it struggles with damp grey soil (F1 0.38, recall 0.30): 103 of the 211 damp grey rows are labelled very damp grey soil. A single linear boundary cannot separate classes whose spectral profiles overlap like these. |
+| Decision Tree | Scores 85.05% accuracy, slightly above Logistic Regression, but it memorises the training data: 100% training accuracy against 85% on the test set, with a tree 21 levels deep and 382 leaves. Its AUC of 0.9002 is the lowest of all five models, because a fully grown tree gives almost all-or-nothing class probabilities, which ranks rows poorly. Damp grey soil is again the weak class (F1 0.55). Limiting the depth would likely reduce the overfitting. |
+| KNN | The best accuracy (90.45%) and the best Precision (0.8951), Recall (0.8886), F1 (0.8916) and MCC (0.8827), with a second-best AUC of 0.9786. The gap between training accuracy (93.9%) and test accuracy (90.5%) is small, so it generalises well. It is also the best model on the hardest class, damp grey soil (F1 0.71, 145 of 211 rows correct). After scaling, pixels of the same land-cover class sit close together, which suits a nearest-neighbour vote. |
+| Naive Bayes | The weakest model on accuracy (79.65%), F1 (0.7833) and MCC (0.7531). Training accuracy (79.8%) is almost the same as test accuracy (79.7%), so it underfits rather than overfits: its assumptions are too simple for this data. The features are strongly correlated (neighbouring pixels up to 0.959), which breaks the independence assumption Naive Bayes relies on. It struggles most with soil with vegetation stubble (F1 0.65) and damp grey soil (F1 0.57); 93 very damp grey rows were labelled damp grey. Its AUC (0.9551) is still better than the Decision Tree's, so its probabilities rank reasonably even when its hard labels are wrong. |
+| Support Vector Machine | Second on accuracy (89.55%) and best on AUC (0.9850), meaning it ranks the correct class highest more consistently than any other model. Training accuracy is 91.0% against 89.6% on test, so it generalises well, and it uses 1,432 of the 4,435 training rows as support vectors. It is very strong on red soil (F1 0.99), cotton crop (0.97) and grey soil (0.92), but its recall on damp grey soil is only 0.58 (F1 0.64), which is where it falls behind KNN. |
+| **Overall winner for this dataset** | **KNN.** It is best on five of the six metrics (Accuracy, Precision, Recall, F1, MCC) and is also best on the hardest class. SVM is a close second: it has the highest AUC, and its accuracy is only 0.9 percentage points lower (18 of the 2,000 test rows). Because the dataset documentation asks for a single train/test run instead of cross-validation, differences this small should be read with caution, but both models are clearly ahead of Logistic Regression, the Decision Tree and Naive Bayes. Damp grey soil is the hardest class for every model, and it is mostly confused with very damp grey soil and grey soil. |
 
 ## How to run
 
 ```
 pip install -r requirements.txt
-python prepare_data.py     # writes test_data.csv from data/sat.tst
-python train.py            # trains the 5 models into model/ and writes results/metrics_comparison.csv
+python src/core.py         # prints the EDA, writes test_data.csv, trains the 5 models into model/
 streamlit run app.py       # launches the app
 ```
 
