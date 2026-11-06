@@ -24,7 +24,7 @@ from src.training_all_models import (
     model_path,
 )
 
-BUNDLED_TEST_FILE = Path(__file__).resolve().parent / "test_data.csv"
+SAMPLE_TEST_FILE = Path(__file__).resolve().parent / "test_data.csv"
 FEATURES = feature_names()
 
 st.set_page_config(
@@ -55,10 +55,8 @@ def score_model(name, data):
     }
 
 
-def read_input(uploaded_file, use_bundled):
-    """Return (dataframe, source label), or (None, None) if nothing was chosen."""
-    if use_bundled:
-        return pd.read_csv(BUNDLED_TEST_FILE), "bundled test_data.csv"
+def read_input(uploaded_file):
+    """Return (dataframe, file name), or (None, None) if nothing was uploaded."""
     if uploaded_file is not None:
         return pd.read_csv(uploaded_file), uploaded_file.name
     return None, None
@@ -144,11 +142,10 @@ with st.sidebar:
 
     st.subheader("Test data")
     uploaded = st.file_uploader("Upload test CSV", type="csv")
-    use_bundled = st.checkbox("Use the bundled test_data.csv instead")
-    if BUNDLED_TEST_FILE.exists():
+    if SAMPLE_TEST_FILE.exists():
         st.download_button(
             "Download sample test_data.csv",
-            data=BUNDLED_TEST_FILE.read_bytes(),
+            data=SAMPLE_TEST_FILE.read_bytes(),
             file_name="test_data.csv",
             mime="text/csv",
         )
@@ -164,10 +161,10 @@ st.write(
     "9 pixels = 36 features). The models predict the land-cover class of the central pixel."
 )
 
-data, source = read_input(uploaded, use_bundled)
+data, source = read_input(uploaded)
 
 if data is None:
-    st.info("Upload a test CSV in the sidebar, or tick the bundled test data option, to begin.")
+    st.info("Upload a test CSV in the sidebar to begin. You can download a sample file there.")
     with st.expander("Expected file format and classes", expanded=True):
         st.write(f"Columns: {', '.join(FEATURES[:4])}, ... , {FEATURES[-1]}, `{TARGET_COL}`")
         st.table(pd.DataFrame({"Label": list(CLASS_NAMES), "Class": list(CLASS_NAMES.values())}))

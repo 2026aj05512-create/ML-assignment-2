@@ -112,7 +112,7 @@ Findings from the exploratory analysis (the EDA block of
 
 https://github.com/2026aj05512-create/ML-assignment-2
 
-Live Streamlit app: _link to be added after deployment._
+Live Streamlit app: https://ml-assignment-2-2026aj05512.streamlit.app/
 
 ### Main project files
 
@@ -128,7 +128,7 @@ Live Streamlit app: _link to be added after deployment._
 
 ### What the app does
 
-- Upload a test CSV, or tick the option to use the bundled `test_data.csv`.
+- Upload a test CSV (a sample, `test_data.csv`, can be downloaded from the sidebar).
 - Choose a model from a dropdown. The saved model is loaded, not retrained.
 - Shows Accuracy, AUC, Precision, Recall, F1 and MCC for the chosen model.
 - Shows the confusion matrix and the per-class classification report.
